@@ -1,0 +1,44 @@
+name: Maxmind Update
+
+on:
+  push:
+    paths:
+      - '.github/workflows/update.yml'
+    branches:
+      - 'master'
+  # Once a week
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install UV
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Update database
+        working-directory: ci/
+        run: uv run main.py
+        env:
+          MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
+          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
+
+      - name: Upload database to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: db/*.mmdb.tar.gz
+          file_glob: true
+          tag: latest
+          overwrite: true
+          body: "Maxmind Database"

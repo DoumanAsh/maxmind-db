@@ -1,0 +1,1 @@
+https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz
