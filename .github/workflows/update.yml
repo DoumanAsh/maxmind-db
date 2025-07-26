@@ -1,0 +1,36 @@
+name: Maxmind Update
+
+on:
+  # Once a week
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install UV
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Update database
+        working-directory: ci/
+        run: uv run main.py
+        env:
+          MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
+          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
+
+      - name: Commit & Push changes
+        uses: actions-js/push@v1
+        with:
+          message: "Update database ${date}"
+          branch: "master"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
