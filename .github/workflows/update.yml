@@ -29,8 +29,9 @@ jobs:
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
 
       - name: Commit & Push changes
-        uses: actions-js/push@v1
+        uses: actions-js/push@v1.5
         with:
           message: "Update database ${date}"
           branch: "master"
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          force: true
