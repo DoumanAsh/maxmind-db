@@ -1,0 +1,62 @@
+[project]
+name = "python-uv-template"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+]
+
+[dependency-groups]
+dev = [
+    "python-lsp-ruff>=2.3.0",
+    "python-lsp-server>=1.14.0",
+]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+show-fixes = true
+
+[tool.ruff.lint]
+select = [
+    "N", "E4", "E7", "E9", "F", "W191",
+    "FIX001", "FIX002",
+    #https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
+    "C4",
+    #https://docs.astral.sh/ruff/rules/#flake8-implicit-str-concat-isc
+    "ISC",
+    #https://docs.astral.sh/ruff/rules/#flake8-logging-log
+    "LOG",
+    #https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
+    "G0",
+    #https://docs.astral.sh/ruff/rules/#flake8-pie-pie
+    "PIE",
+    #https://docs.astral.sh/ruff/rules/#flake8-return-ret
+    "RET",
+    #https://docs.astral.sh/ruff/rules/#flake8-self-slf
+    "SLF",
+    #https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
+    "SIM",
+    #https://docs.astral.sh/ruff/rules/#flake8-type-checking-tc
+    "TC",
+    #https://docs.astral.sh/ruff/rules/#flake8-unused-arguments-arg
+    "ARG",
+    #https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
+    "PTH",
+    #https://docs.astral.sh/ruff/rules/#mccabe-c90
+    "C901",
+    #https://docs.astral.sh/ruff/rules/#perflint-perf
+    "PERF",
+    #https://docs.astral.sh/ruff/rules/#error-ple
+    "PLE",
+    #https://docs.astral.sh/ruff/rules/#warning-plw
+    "PLW",
+    #https://docs.astral.sh/ruff/rules/#pyupgrade-up
+    "UP",
+    #https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
+    "RUF",
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
