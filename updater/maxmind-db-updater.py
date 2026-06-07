@@ -1,7 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import json
 import tarfile
 import shutil
+import subprocess
 from dataclasses import dataclass
 from sys import argv, exit
 from urllib.request import urlopen, urlretrieve
@@ -49,7 +50,7 @@ def fetch_release_info():
         for asset in assets:
             yield AssetInfo(id=asset['id'], url=asset['url'], name=asset['name'])
 
-def download_asset_if_outdated(asset: AssetDetails, output: Path):
+def download_asset_if_outdated(asset: AssetDetails, output: Path, pre_hook: Path, post_hook: Path):
     output_dest = output.joinpath(asset.name)
     output_dest_checksum = output.joinpath(f"{asset.name}.checksum")
     digest = asset.get_digest()
@@ -66,6 +67,9 @@ def download_asset_if_outdated(asset: AssetDetails, output: Path):
         print(f"{asset.browser_download_url}: Downloading...")
         urlretrieve(asset.browser_download_url, output_dest)
 
+    if pre_hook.exists():
+        subprocess.run(["sh", pre_hook], shell=False, check=False)
+
     print(f"{asset.browser_download_url}: Extracting...")
     with tarfile.open(output_dest, "r:gz") as output_tar:
         for member in output_tar.getmembers():
@@ -79,11 +83,17 @@ def download_asset_if_outdated(asset: AssetDetails, output: Path):
     with output_dest_checksum.open('w') as output_dest_checksum:
         output_dest_checksum.write(digest.strip())
 
+    if post_hook.exists():
+        subprocess.run(["sh", pre_hook], shell=False, check=False)
+
+
 def main(args: list[str]):
     cli = ArgumentParser(prog="maxmind-db-updater", description="Script to download maxmind DB")
     cli.add_argument("-o", "--output", default=CWD, required=False, type=Path, help="Folder where to to download db files. Defaults to script's folder")
     cli.add_argument("--country", action=BooleanOptionalAction, required=False, default=False, help="Specifies whether to download country database")
     cli.add_argument("--city", action=BooleanOptionalAction, required=False, default=False, help="Specifies whether to download city database")
+    cli.add_argument("--pre-update-hook", type=Path, required=False, default=CWD.joinpath("pre-update-hook.sh"), help="Specifies script to run before update")
+    cli.add_argument("--post-update-hook", type=Path, required=False, default=CWD.joinpath("post-update-hook.sh"), help="Specifies script to run after update")
     args = cli.parse_args(args)
 
     if not args.output.is_dir():
@@ -102,7 +112,7 @@ def main(args: list[str]):
 
     for asset in fetch_release_info():
         if asset.name in download_list:
-            download_asset_if_outdated(asset.fetch_details(), args.output)
+            download_asset_if_outdated(asset.fetch_details(), args.output, args.pre_update_hook, args.post_update_hook)
 
 if __name__ == "__main__":
     main(argv[1:])
