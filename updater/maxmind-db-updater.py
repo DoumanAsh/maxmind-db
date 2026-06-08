@@ -84,7 +84,7 @@ def download_asset_if_outdated(asset: AssetDetails, output: Path, pre_hook: Path
         output_dest_checksum.write(digest.strip())
 
     if post_hook.exists():
-        subprocess.run(["sh", pre_hook], shell=False, check=False)
+        subprocess.run(["sh", post_hook], shell=False, check=False)
 
 
 def main(args: list[str]):
